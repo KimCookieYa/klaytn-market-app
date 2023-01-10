@@ -32,12 +32,39 @@ const readCount = async() => {
   console.log(_count);
 };
 
+const getBalance = (address) => {
+  return caver.rpc.klay.getBalance(address).then((response) => {
+    const balance = caver.utils.convertFromPeb(caver.utils.hexToNumberString(response));
+    console.log(`BALANCE: ${balance}`);
+    return balance;
+  })
+};
+
+const setCount = async (newCount) => {
+  try {
+    const privateKey = '0x90e44397ec72cfdcec82d24ef850aa991a66cb13b442aaa6a5df1873f2b601ac';
+    const deployer = caver.wallet.keyring.createFromPrivateKey(privateKey);
+    caver.wallet.add(deployer);
+
+
+    const receipt = await CountContract.methods.store(newCount).send({
+      from: deployer.address,
+      gas: "0x4bfd200"
+    });
+    console.log(receipt);
+  } catch(e) {
+    console.log(`[ERROR_SET_COUNT]${e}`);
+  }
+}
+
 function App() {
   readCount();
+  getBalance('0xe659293e264441782f08585c40de9325f235d779');
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <button title={'Set Count'} onClick={()=>{setCount(100)}} />
         <p>
           GOOD! <code>src/App.js</code> and save to reload.
         </p>
