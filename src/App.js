@@ -1,13 +1,45 @@
 import logo from './logo.svg';
 import './App.css';
+import Caver from 'caver-js';
+
+import * as buffer from "buffer";
+window.Buffer = buffer.Buffer;
+
+const COUNT_CONTRACT_ADDRESS = '0x6C2352A0d0053140c2bf5Eb3dDF017c6860C6E31';
+const ACCESS_KEY_ID = 'KASKVQPIZU3LJ7M2CE8DS9HU';
+const SECRET_ACCESS_KEY = 'F06s3XjM7GBsq9kJBAF0vcKSbkno4c2zoaRnIq1A';
+const CHAIN_ID = '1001';
+const COUNT_ABI = '[ { "inputs": [], "name": "retrieve", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "num", "type": "uint256" } ], "name": "store", "outputs": [], "stateMutability": "nonpayable", "type": "function" } ]';
+// eslint-disable-next-line
+const author_value = Buffer.from(ACCESS_KEY_ID + ":" + SECRET_ACCESS_KEY)
+const option = {
+ headers: [
+  {
+    name: "Authorization",
+    value: "Basic " + author_value
+  },
+  {
+    name: "x-chain-id",
+    value: CHAIN_ID
+  }
+ ]
+};
+
+const caver = new Caver(new Caver.providers.HttpProvider("https://node-api.klaytnapi.com/v1/klaytn", option));
+const CountContract = new caver.contract(JSON.parse(COUNT_ABI), COUNT_CONTRACT_ADDRESS)
+const readCount = async() => {
+  const _count = await CountContract.methods.count().call();
+  console.log(_count);
+};
 
 function App() {
+  readCount();
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          GOOD <code>src/App.js</code> and save to reload.
+          GOOD! <code>src/App.js</code> and save to reload.
         </p>
         <a
           className="App-link"
